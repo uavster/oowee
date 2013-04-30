@@ -1,5 +1,5 @@
-OOWEE CMS
-=========
+OOWEE
+=====
 Oowee is a PHP website engine with a Content Management System (CMS). Yes, yet another one. I have developed it during the last year in my spare time, as a zen therapy. In the beginning, coding Oowee just helped me to relax after work but finally it has become something useful and I felt the need to share. After all, it's powering my website at http://uavster.com
 
 Use Oowee if you:
