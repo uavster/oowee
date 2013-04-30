@@ -1,0 +1,1 @@
+<? __if userName ?>Logged in as <span class="user"><? userName ?></span><form id="logout-form" name="logout-form" action="" method="post"><input type="hidden" name="um-logout" value="1"></form><img src="<? imgBaseUrl ?>logout.png" alt="Log out" title="Log out" onclick="document.getElementById('logout-form').submit()"><? __end ?>
