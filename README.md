@@ -36,6 +36,14 @@ Features
 - All code is object-oriented
 - Support for multiple encodings
 
+Installation
+------------
+To install Oowee follow these steps:
+1. Copy all Oowee files to a folder accessible under your HTTP server public directory. For instance: {HTTP public directory}/oowee
+2. Copy the files in the 'install' folder to your HTTP server public directory (i.e. public_html, www, ...)
+3. If you placed Oowee files in '{HTTP public directory}/oowee', skip this step. Otherwise, edit the copied index.php and change the include line so it points to your Oowee directory.
+4. Edit {HTTP public directory}/sites/SitesConfig.php and follow the comments to configure your sites.
+
 Documentation
 -------------
 I'm in the process of writing it. Please, be patient and shoot any questions to ignacio (dot) mellado (at) gmail (dot) com

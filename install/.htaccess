@@ -1,0 +1,14 @@
+Options +FollowSymLinks
+RewriteEngine on
+
+RewriteCond %{HTTP_HOST} ^localhost$ [OR]
+RewriteCond %{HTTP_HOST} ^192.168.1.33$
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.*)$ /uavster/index\.php?q=$1 [QSA,PT]
+RewriteRule .* - [E=HTTP_IF_MODIFIED_SINCE:%{HTTP:If-Modified-Since}]
+RewriteRule .* - [E=HTTP_IF_NONE_MATCH:%{HTTP:If-None-Match}]
+
+RewriteCond  %{REQUEST_FILENAME} !-f
+RewriteRule ^(.*)$ /index\.php?q=$1 [QSA,PT]
+RewriteRule .* - [E=HTTP_IF_MODIFIED_SINCE:%{HTTP:If-Modified-Since}]
+RewriteRule .* - [E=HTTP_IF_NONE_MATCH:%{HTTP:If-None-Match},L]
