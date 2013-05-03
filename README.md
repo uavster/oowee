@@ -39,6 +39,7 @@ Features
 Installation
 ------------
 To install Oowee follow these steps:
+
 1. Copy all Oowee files to a folder accessible under your HTTP server public directory. For instance: {HTTP public directory}/oowee
 2. Copy the files in the 'install' folder to your HTTP server public directory (i.e. public_html, www, ...)
 3. If you placed Oowee files in '{HTTP public directory}/oowee', skip this step. Otherwise, edit the copied index.php and change the include line so it points to your Oowee directory.
