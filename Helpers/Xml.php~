@@ -28,7 +28,7 @@ class Helpers_Xml {
 			$name = strtolower($attr[1][0]);
 			if (array_key_exists($name, $output)) return false;
 			$output[$name] = $attr[2][0];
-			if (is_array($attrOffsets)) $attrOffsets[$name] = array('contentStart' => $attr[2][1], 'contentEnd' => $attr[3][1]);
+			if (is_array($attrOffsets)) $attrOffsets[$name] = $attr[2][1];
 		}
 		return $output;
 	}
