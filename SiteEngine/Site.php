@@ -133,7 +133,7 @@ class SiteEngine_Site {
 	public function getWidgetPathsInSiteMapByName($name) {
 		$widgetPaths = array();
 		foreach($this->map['pages'] as $page => $config) {
-			if (!isset($config['labels'])) continue;
+			if ((!is_array($config)) || (!array_key_exists('labels', $config))) continue;
 
 			$labels = $config['labels'];
 			foreach($labels as $label => $content) {
