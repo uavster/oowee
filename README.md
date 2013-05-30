@@ -49,4 +49,8 @@ Documentation
 -------------
 I'm in the process of writing it. Please, be patient and shoot any questions to ignacio (dot) mellado (at) gmail (dot) com
 
+Contact
+-------
+For suggestions, please go to http://uavster.com/contact
+
 Happy coding!
