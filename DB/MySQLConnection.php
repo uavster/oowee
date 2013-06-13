@@ -19,7 +19,7 @@ class DB_MySQLConnection extends DB_Connection implements DB_IConnection {
 	}
 	
 	function __destruct() {
-		mysql_close($this->link);
+		if ($this->isConnected()) mysql_close($this->link);
 	}
 
 	public function isConnected() {
