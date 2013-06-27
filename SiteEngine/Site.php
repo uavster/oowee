@@ -44,9 +44,9 @@ class SiteEngine_Site {
 					else $value1 = $a1[$key];
 				} else $value1 = array();
 				$field = array();
-				if ($value[0] == '__replace__') $merge = false;
+				if (count($value) > 0 && $value[0] == '__replace__') $merge = false;
 				else $merge = true;
-				if ($value[0] == '__replace__' || $value[0] == '__merge__') 
+				if (count($value) > 0 && ($value[0] == '__replace__' || $value[0] == '__merge__')) 
 					$trimmedValue = array_slice($value, 1);
 				else 
 					$trimmedValue = $value;
@@ -296,7 +296,7 @@ class SiteEngine_Site {
 	// be the same as the encoding of the site map file. However, the error messages use standard English characters
 	// that are equal in the most common encodings (at least in ANSI and UTF-8).
 	public function encodeOutput($string) {
-		return htmlentities($string, ENT_QUOTES | ENT_HTML401, $this->getEncoding());
+		return htmlentities($string, ENT_QUOTES, $this->getEncoding());
 	}
 	
 	private $widgetsByName = array();

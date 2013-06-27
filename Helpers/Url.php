@@ -6,7 +6,7 @@ class Helpers_Url {
 
 	public static function getQueryProtocol() {
 		$proto = 'http';
-		if ($_SERVER['HTTPS'] == 'on') $proto .= 's';
+		if (array_key_exists('HTTPS', $_SERVER) && $_SERVER['HTTPS'] == 'on') $proto .= 's';
 		return $proto;
 	}
 
