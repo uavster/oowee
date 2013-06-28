@@ -408,7 +408,7 @@ class SiteEngine_Template {
 				$inAttr = $destParts[1];
 			}
 			$tags = Helpers_Xml::findTags($output, $destination, $offset, 1);
-			if ($tags !== false) {
+			if ($tags !== false && count($tags) > 0) {
 				$tag = $tags[0];
 
 				$attrInfo = false;

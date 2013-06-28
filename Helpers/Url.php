@@ -69,9 +69,9 @@ class Helpers_Url {
 	}
 
 	public static function getParam($url, $param_name) {
-		$url_parts = parse_url($url);
-		if (is_bool($url_parts)) return;
-		$parameters = explode("&", urldecode($url_parts['query']));
+		$url_query = parse_url($url, PHP_URL_QUERY);
+		if ($url_query === NULL) return;
+		$parameters = explode("&", urldecode($url_query));
 		$param_name = strtolower($param_name);
 		foreach($parameters as $parameter) {
 			$param_parts = explode("=", $parameter);

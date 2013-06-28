@@ -333,7 +333,7 @@ class SiteEngine_Widget {
 	}
 
 	protected function assocArrayToScript($name, $array) {
-		$code .= "var $name = {";
+		$code = "var $name = {";
 		$values = '';
 		foreach($array as $key => $element) {
 			if ($values != '') $values .= ',';
