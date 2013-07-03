@@ -42,7 +42,7 @@ class Helpers_Url {
 	}
 
 	public static function isAbsolute($url) {
-		return $url[0] == '/' || strpos($url, '://') !== false;
+		return (count($url) > 0 && $url[0] == '/') || (strpos($url, '://') !== false);
 	}
 
 	public static function stringToRef($str) {

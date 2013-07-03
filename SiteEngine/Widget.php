@@ -39,7 +39,13 @@ class SiteEngine_Widget {
 
 	public function getBaseUrl() {
 		$reflector = new ReflectionClass(get_class($this));
-		return $this->site->getAbsoluteUrlForPath(dirname($reflector->getFileName()));
+		return getSite()->getAbsoluteUrlForPath(dirname($reflector->getFileName()));
+	}
+
+	public static function getBaseUrl_($widgetName) {
+		$widgetPath = getSite()->findPathToWidget($widgetName);
+		if ($widgetPath === false) throw new Exception('Unable to locate widget "' . $widgetName . '"');			
+		return getSite()->getAbsoluteUrlForPath($widgetPath);
 	}
 
 	public function setProcessOutputContentType($type) {
@@ -430,16 +436,28 @@ class SiteEngine_Widget {
 		return $output;
 	}
 
-	public function getCMSMediaUrlByRef($ref) {
+	public static function getCMSMediaUrlByRef_($ref) {
 		return Widget_CMS::getMediaUrl($ref);
 	}
 
-	public function getCMSUploadMediaUrl() {
+	public static function getCMSUploadMediaUrl_() {
 		return Widget_CMS::getMediaUrl('0', 'new');
 	}
 
-	public function getCMSBrowseMediaUrl($onSelectHandler = null, $handlerExtraParams = null) {
+	public static function getCMSBrowseMediaUrl_($onSelectHandler = null, $handlerExtraParams = null) {
 		return Widget_CMS::getBrowserUrl($onSelectHandler, $handlerExtraParams);
+	}
+
+	public function getCMSMediaUrlByRef($ref) {
+		return self::getCMSMediaUrlByRef_($ref);
+	}
+
+	public function getCMSUploadMediaUrl() {
+		return self::getCMSUploadMediaUrl_();
+	}
+
+	public function getCMSBrowseMediaUrl($onSelectHandler = null, $handlerExtraParams = null) {
+		return self::getCMSBrowseMediaUrl_($onSelectHandler, $handlerExtraParams);
 	}
 }
 
