@@ -9,6 +9,14 @@ class Widget_CMS extends SiteEngine_Widget {
 		return self::getBackCMSUrl() . $ref . ($action != '' ? ('/' . $action) : '');
 	}
 
+	public static function getMediaRefByUrl($url) {
+		$cmsPart = self::getBackCMSUrl();	// Only media of this site will be identified
+		if (strpos($url, $cmsPart) === 0)
+			return substr($url, strlen($cmsPart));
+		else 
+			return false;
+	}
+
 	public static function getBrowserUrl($onSelectHandler = null, $handlerExtraParams = null) {
 		$url = getSite()->getBaseUrl() . 'cms';
 		if ($onSelectHandler !== null) $url = Helpers_Url::setParam($url, 'selectFuncName', $onSelectHandler);
@@ -16,12 +24,12 @@ class Widget_CMS extends SiteEngine_Widget {
 		return $url;
 	}
 
-	protected function findMediaByRef($ref) {
+	public static function findMediaByRef($ref) {
 		return R::findOne('media', '(ref = ?) and (site = ?)', array($ref, getSite()->getName()));
 	}
 
 	protected function refExists($ref) {
-		return $this->findMediaByRef($ref) !== null;
+		return self::findMediaByRef($ref) !== null;
 	}
 
 	protected function ensureRefIsUnique($baseRef) {
@@ -67,7 +75,7 @@ class Widget_CMS extends SiteEngine_Widget {
 			if (!$edit) {
 				$newMedia = R::dispense('media');
 			} else {
-				$newMedia = $this->findMediaByRef($ref);
+				$newMedia = self::findMediaByRef($ref);
 				if ($newMedia === null) throw new Exception('Media not found');
 			}
 
@@ -121,7 +129,7 @@ class Widget_CMS extends SiteEngine_Widget {
 	}
 
 	protected function readMedia($ref) {
-		$media = $this->findMediaByRef($ref);
+		$media = self::findMediaByRef($ref);
 		if ($media === null) {
 			$this->setProcessOutputContentType('text/html');
 			return getSite()->outputDocNotFound();
@@ -134,7 +142,7 @@ class Widget_CMS extends SiteEngine_Widget {
 	}
 
 	protected function deleteMedia($ref) {
-		$media = $this->findMediaByRef($ref);
+		$media = self::findMediaByRef($ref);
 		if ($media === null) throw new Exception('Media not found');
 		R::trash($media);
 		return array('result' => 'ok');				
