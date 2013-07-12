@@ -130,7 +130,8 @@ class SiteEngine_Site {
 		}
 	}
 
-	public function getWidgetPathsInSiteMapByName($name) {
+	public function getWidgetPathsInSiteMapByName($name, &$widgetParams = false) {
+		if ($widgetCallStrings !== false) $widgetCallStrings = array();
 		$widgetPaths = array();
 		foreach($this->map['pages'] as $page => $config) {
 			if ((!is_array($config)) || (!array_key_exists('labels', $config))) continue;
@@ -140,7 +141,12 @@ class SiteEngine_Site {
 				$labelInfo = $this->decodeSiteMapLabel($content);
 				if ($labelInfo['type'] == 'widget') {
 					$widgetInfo = SiteEngine_Widget::deserializeCall($labelInfo['content']);
-					if ($widgetInfo['name'] == $name) $widgetPaths[] = $page . '/' . $label;
+					if ($widgetInfo['name'] == $name) {
+						$widgetPaths[] = $page . '/' . $label;
+						if (is_array($widgetCallStrings)) {
+							$widgetParams[] = $widgetInfo['params'];
+						}
+					}
 				}
 			}
 		}
