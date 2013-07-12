@@ -218,11 +218,13 @@ class Helpers_Xml {
 	 *	$maxChars - Number of characters that will be kept in the summary (it includes tags)
 	 *	$htmlMode - If true, it does not close open tags when they are HTML empty elements like <br>, <area>, <input>, etc.
 	 *		    If false, it closes any open tag.
-	 *	$addEllipsis - 	If true, an ellipsis is added at the cutting point. The ellipsis is merged with any existing points at 
+	 *	$ellipsis - 	If true, an ellipsis is added at the cutting point. The ellipsis is merged with any existing points at 
 	 *			the cutting point so no more than three points appear at the end of the summary.
+	 *	$respectWordBoundaries - If true, it moves the cut point to the next space or tag start in case it fell in a word.
+	 *				 If false, words may be cut at any point.
 	 * Output: XML piece of code. It may be longer than maxChars due to extra code to keep XML correctness.
 	 */
-	public static function xmlCut($xml, $maxChars, $htmlMode = false, $addEllipsis = true) {
+	public static function xmlCut($xml, $maxChars, $htmlMode = false, $ellipsis = '...', $respectWordBoundaries = true) {
 		$cutPoint = $maxChars;
 
 		// Check if the cut position is between quotes
@@ -262,16 +264,20 @@ class Helpers_Xml {
 			else $cutPoint = $tagEndMark + 1;
 		}
 
+		// Respect word boundaries
+		if ($respectWordBoundaries) {
+			$xmlLen = strlen($xml);
+			while($cutPoint < $xmlLen && $xml[$cutPoint] != ' ' && $xml[$cutPoint] != '<') $cutPoint++;
+		}
+
 		$text = substr($xml, 0, $cutPoint);
 
-		if ($addEllipsis && $cutPoint < strlen($xml)) {
-			$i = $cutPoint - 1;
-			$pointsToAdd = 3;
-			while ($i >= 0 && $pointsToAdd > 0 && $text[$i] == '.') {
-				$i--;
-				$pointsToAdd--;
+		// Add ellipsis
+		if (is_string($ellipsis) && ($eLen = strlen($ellipsis)) > 0 && $cutPoint < strlen($xml)) {
+			for ($i = $eLen; $i > 0; $i--) {
+				if (substr($xml, $cutPoint - $i, $i) == substr($ellipsis, 0, $i)) break;
 			}
-			for ($i = 0; $i < $pointsToAdd; $i++) $text .= '.';
+			if ($i < $eLen) $text .= substr($ellipsis, $i);
 		}
 
 		return self::fixBrokenXml($text, $htmlMode);
@@ -321,7 +327,7 @@ class Helpers_Xml {
 			$pLen = strlen($pContent);
 			if ($pLen >= $minLengthToIncludeParagraph) {
 				if ($pLen > $charsPerParagraph * 1.1) {
-					$pSummary = self::xmlCut($pContent, $charsPerParagraph, true, true);
+					$pSummary = self::xmlCut($pContent, $charsPerParagraph, true, ' [...]');
 				} else {
 					$pSummary = $pContent;
 				}
