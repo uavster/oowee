@@ -393,22 +393,22 @@ class SiteEngine_Site {
 				} else $output = $this->encodeOutput("Unable to locate template \"$labelContent\"");
 				break;
 			case 'widget':
-				$callInfo = $this->decodeWidgetCall($labelContent, $this->query . '/' . $originalLabel);
-				if (is_array($callInfo)) {
-					$this->logContext = $callInfo['className'];
-					$widget = $callInfo['instance'];
-					try {
+				$this->logContext = $callInfo['className'];
+				try {
+					$callInfo = $this->decodeWidgetCall($labelContent, $this->query . '/' . $originalLabel);
+					if (is_array($callInfo)) {
+						$widget = $callInfo['instance'];
 						$tmp = $widget->draw($callInfo['params'], $this->requestType, $_REQUEST);
 						$this->currentTemplate->addMovePending($widget->getMovePending());
 						$output = $tmp !== NULL ? $tmp . $widget->getContent() : $widget->getContent();
-					} catch(Exception $e) {
-						error($e->getMessage());
-						$output = $e->getMessage();
+					} else {
+						$output = $this->encodeOutput($callInfo);
 					}
-					$this->logContext = get_class($this);
-				} else {
-					$output = $this->encodeOutput($callInfo);
+				} catch(Exception $e) {
+					error($e->getMessage());
+					$output = $e->getMessage();
 				}
+				$this->logContext = get_class($this);
 				break;
 		}
 		return $output;
