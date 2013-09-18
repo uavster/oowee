@@ -646,7 +646,15 @@ class SiteEngine_Site {
 		$this->currentTemplate->addMovePending(array(array('destination' => $section, 'content' => $content)));
 	}
 
-	public function dispatchQuery($query, $requestType) {
+	public function dispatchQuery($unresolvedQuery, $requestType) {
+		if ($this->resolveQueryAlias($unresolvedQuery, $query)) {
+			$params = Helpers_Url::urlParamsToArray($query);
+			$_REQUEST = array_merge($_REQUEST, $params);
+			$_GET = array_merge($_GET, $params);
+			// Remove parameters in resolved query and add them to $_REQUEST and $_GET
+			$query = str_replace('?'.parse_url($query, PHP_URL_QUERY), '', $query);
+		}
+
 		$this->requestType = $requestType;
 		$this->query = $query;
 		global $ooweeConfig;
@@ -657,6 +665,27 @@ class SiteEngine_Site {
 		} else { 
 			$this->processLogicQuery(substr($query, strlen($logicMarker))); 
 		}
+	}
+
+	protected function resolveQueryAlias($query, &$resolvedQuery) {
+		$resolvedQuery = $query;
+		if (!isset($this->map['queryAliases'])) return false;
+		$queryAliases = $this->map['queryAliases'];
+		
+		if (isset($queryAliases[$query])) {
+			$resolvedQuery = $queryAliases[$query];
+			return true;
+		} else {
+			$len = strlen($query);
+			if ($query[$len - 1] == '/') {
+				$query = substr($query, 0, $len - 1);
+				if (isset($queryAliases[$query])) {
+					$resolvedQuery = $queryAliases[$query];
+					return true;				
+				}
+			}
+		}
+		return false;
 	}
 }
 
