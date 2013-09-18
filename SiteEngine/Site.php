@@ -531,7 +531,7 @@ class SiteEngine_Site {
 			header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $lastChangeTime) . ' GMT', true, 304);
 			return false;
 		} else {
-			// File not cached or cache outdated, we respond '200 OK' and output the image.
+			// File not cached or cache outdated, we respond '200 OK' and output the data.
 			header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $lastChangeTime) . ' GMT', true, 200);
 			return true;
 		}	
@@ -569,6 +569,11 @@ class SiteEngine_Site {
 	public function outputDocNotFound() {
 		header('HTTP/1.0 404 Not Found');
 		include SiteEngine_SiteManager::getDefaultUnknownSiteDoc();
+	}
+
+	public static function makeLogicQuery($query) {
+		global $ooweeConfig;
+		return getSite()->getBaseUrl() . $ooweeConfig['logicQueryMarker'] . $query;
 	}
 
 	protected function processLogicQuery($query) {
@@ -620,9 +625,15 @@ class SiteEngine_Site {
 			header("Expires: 0");
 			header("Pragma: no-cache");
 			header("Cache-Control: no-cache, must-revalidate, post-check=0, pre-check=0");
+			echo $output;
+		} else {
+			$modTime = $widget->getProcessOutputModificationTime();
+			if ($modTime === false || $this->cacheControl($modTime)) {
+				// Send the info, as no modification time was specified or the client cache is out of date
+				echo $output;
+			}
 		}
 
-		echo $output;
 	}
 
 	private $uiQuery;

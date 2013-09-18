@@ -23,6 +23,7 @@ class SiteEngine_Widget {
 	private static $addedScriptRefs = array();
 	private $processOutputContentType = null;
 	private $processOutputClientCacheDisabled = true;
+	private $processOutputModificationTime = false;
 
 	function __construct($site, $id) {
 		$this->site = $site;
@@ -66,6 +67,15 @@ class SiteEngine_Widget {
 
 	public function isProcessOutputClientCacheDisabled() {
 		return $this->processOutputClientCacheDisabled;
+	}
+
+	public function setProcessOutputModificationTime($timestamp) {
+		$this->enableProcessOutputClientCache();
+		return $this->processOutputModificationTime = $timestamp;
+	}
+
+	public function getProcessOutputModificationTime() {
+		return $this->processOutputModificationTime;
 	}
 
 	private static function findConfigRef($str) {
