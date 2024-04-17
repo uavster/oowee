@@ -616,28 +616,35 @@ class SiteEngine_Site {
 			$this->logContext = get_class($this);
 		}
 
+    // This block must set $content_type and $content_length.
 		if ($error || $widget->getProcessOutputContentType() === null) {
 			// Transform output to XML
 			$output = SiteEngine_Widget::outputToXml($error, $output);
 			// Output headers
       // The XML template is at oowee, so the encoding is not that of the site.
       global $ooweeConfig;
-			header('Content-Type: ' . Helpers_Mime::fileExtensionToMimeType('xml', $ooweeConfig['sitesConfigEncoding']));
+      $content_type = Helpers_Mime::fileExtensionToMimeType('xml', $ooweeConfig['sitesConfigEncoding']);
+      $content_length = strlen($output);		// strlen() returns the number of bytes (not characters)
 		} else {
-			header('Content-Type: ' . $widget->getProcessOutputContentType());
+			$content_type = $widget->getProcessOutputContentType();
+      if ($widget->getProcessOutputContentLength() !== false) {
+  		  $content_length = $widget->getProcessOutputContentLength();
+      }
 		}
 
-		// TODO: check why adding content-length we get a "corrupt content" error in old versions of firefox
-//		header('Content-Length: ', strlen($xmlOutput));		// strlen() returns the number of bytes (not characters)
 		if ($error || $widget->isProcessOutputClientCacheDisabled()) {
 			header("Expires: 0");
 			header("Pragma: no-cache");
 			header("Cache-Control: no-cache, must-revalidate, post-check=0, pre-check=0");
+      header("Content-Type: ".$content_type);
+      header("Content-Length: ".$content_length);
 			echo $output;
 		} else {
 			$modTime = $widget->getProcessOutputModificationTime();
 			if ($modTime === false || $this->cacheControl($modTime)) {
 				// Send the info, as no modification time was specified or the client cache is out of date
+        header("Content-Type: ".$content_type);
+        header("Content-Length: ".$content_length);
 				echo $output;
 			}
 		}

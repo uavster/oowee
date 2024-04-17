@@ -22,6 +22,7 @@ class SiteEngine_Widget {
 	private $id;
 	private static $addedScriptRefs = array();
 	private $processOutputContentType = null;
+  private $processOutputContentLength = false;
 	private $processOutputClientCacheDisabled = true;
 	private $processOutputModificationTime = false;
 
@@ -55,6 +56,14 @@ class SiteEngine_Widget {
 
 	public function getProcessOutputContentType() {
 		return $this->processOutputContentType;
+	}
+
+  public function setProcessOutputContentLength($length) {
+		$this->processOutputContentLength = $length;
+	}
+
+	public function getProcessOutputContentLength() {
+		return $this->processOutputContentLength;
 	}
 
 	public function enableProcessOutputClientCache($e = true) {

@@ -121,7 +121,9 @@ class Widget_CMS extends SiteEngine_Widget {
 		if (isset($reqParams['CKEditorFuncNum'])) {
 			$this->setProcessOutputContentType('text/html');
 			$funcNum = $reqParams['CKEditorFuncNum'];
-			return "<script type='text/javascript'>window.parent.CKEDITOR.tools.callFunction($funcNum, '$url', '$message');</script>";
+      $content = "<script type='text/javascript'>window.parent.CKEDITOR.tools.callFunction($funcNum, '$url', '$message');</script>";
+      $this->setProcessOutputContentLength(strlen($content));
+			return $content;
 		} else {
 			if ($message != '') throw new Exception($message);
 			return array('url' => $url);
@@ -132,11 +134,15 @@ class Widget_CMS extends SiteEngine_Widget {
 		$media = self::findMediaByRef($ref);
 		if ($media === null) {
 			$this->setProcessOutputContentType('text/html');
-			return getSite()->outputDocNotFound();
+			$content = getSite()->outputDocNotFound();
+      $this->setProcessOutputContentLength(strlen($content));
+      return $content;
 		}
 
 		$this->enableProcessOutputClientCache();
 		$this->setProcessOutputContentType($media->mime);
+    $this->setProcessOutputContentLength($media->contentLength);
+    $this->setProcessOutputModificationTime($media->lastModified);
 		$sendContent = getSite()->cacheControl($media->lastModified);
 		return $sendContent ? $media->content : '';
 	}
@@ -258,6 +264,7 @@ class Widget_CMS extends SiteEngine_Widget {
 				if (isset($requestParams['selectFuncExtraParams'])) $funcCall .= ', ' . $requestParams['selectFuncExtraParams'];
 				$funcCall .= ')';
 				$onClickCode = $funcCall;
+        $this->setProcessOutputContentLength(strlen($onClickCode));
 			}
 
 			$this->outputScriptCode($onClickCode, 'mediaClicked(ref)');
