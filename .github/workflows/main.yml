@@ -14,4 +14,4 @@ jobs:
         server: ftp.ignaciomellado.es
         username: jorgbi3n
         password: ${{ secrets.ftp_password }}
-        server-dir: public_html/oowee
+        server-dir: public_html/oowee/
