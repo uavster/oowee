@@ -55,7 +55,7 @@ class Helpers_Url {
 	}
 
 	public static function isAbsolute($url) {
-		return (count($url) > 0 && $url[0] == '/') || (strpos($url, '://') !== false);
+		return (is_countable($url) && count($url) > 0 && $url[0] == '/') || (is_string($url) && strpos($url, '://') !== false);
 	}
 
 	public static function stringToRef($str) {

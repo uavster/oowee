@@ -102,7 +102,7 @@ if (session_start()) {
 		if (array_key_exists('um-login', $_POST) && array_key_exists('um-password', $_POST)) {
 			if (session_regenerate_id(true)) {
 				$_SESSION = array();
-				$user = R::findOne('user', 'name = ? and password=password(?)', array($_POST['um-login'], $_POST['um-password']));
+				$user = R::findOne('user', "name = ? and password=CONCAT('*', UPPER(SHA1(UNHEX(SHA1(?)))))", array($_POST['um-login'], $_POST['um-password']));
 				if ($user !== null) {
 					$_SESSION['userid'] = $user->id;
 					if (isset($_POST['goto']) && $_POST['goto'] != '') {

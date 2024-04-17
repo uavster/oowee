@@ -316,6 +316,7 @@ class Helpers_Xml {
 		$html = self::removeTags($html, 'textarea', 0, true);
 		$html = self::removeTags($html, 'button', 0, true);
 		$html = self::removeTags($html, 'table', 0, true);
+		$html = self::removeTags($html, 'small', 0, true);
 
 		$paragraphs = self::findTagsInfo($html, array('name' => 'p', 'attrName' => null, 'attrValue' => null));
 		$summary = '';

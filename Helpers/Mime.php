@@ -2,16 +2,16 @@
 
 class Helpers_Mime {
 
-	public static function fileExtensionToMimeType($ext) {
+	public static function fileExtensionToMimeType($ext, $charset) {
 		switch($ext) {
 			case 'html': 
 			case 'php':
 			case 'htm':
-				return 'text/html';
-			case 'js': return 'text/javascript';
-			case 'css': return 'text/css';
-			case 'xml': return 'application/xml';
-			case 'txt': return 'text/plain';
+				return "text/html; charset=$charset";
+			case 'js': return "text/javascript; charset=$charset";
+			case 'css': return "text/css; charset=$charset";
+			case 'xml': return "application/xml; charset=$charset";
+			case 'txt': return "text/plain; charset=$charset";
 			case 'gif': return 'image/gif';
 			case 'png': return 'image/png';
 			case 'jpg': return 'image/jpeg';

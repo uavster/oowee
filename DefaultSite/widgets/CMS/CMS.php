@@ -67,8 +67,8 @@ class Widget_CMS extends SiteEngine_Widget {
 			} else {
 				$width = $height = -1;
 				if ($mimeType == '0') {
-					// Infere MIME type 
-					$mimeType = Helpers_Mime::fileExtensionToMimeType($extension);
+					// Infer MIME type 
+					$mimeType = Helpers_Mime::fileExtensionToMimeType($extension, getSite()->getEncoding());
 				}
 			}
 
@@ -157,7 +157,7 @@ class Widget_CMS extends SiteEngine_Widget {
 			// Get action and media id
 			$doc = $requestParams['OOWEE_DOCUMENT'];
 			$label = $requestParams['OOWEE_LABEL'];
-			$docParts = split('/', $doc);
+			$docParts = explode('/', $doc);
 			if ($label == '') {
 				if (count($docParts) <= 1) throw new Exception('Bad query');
 				else if (count($docParts) == 2) {
@@ -192,7 +192,7 @@ class Widget_CMS extends SiteEngine_Widget {
 				if ($className::requireUserRights('admin', false) === false) throw new Exception('Access denied');
 
 				if (!isset($edit)) $edit = false;
-				$parts = split('/', $id);
+				$parts = explode('/', $id);
 				if (count($parts) > 2) $ref = implode('/', array_slice($parts, 2));
 				else if (count($parts) == 2 && $parts[0] == '0') $ref = $parts[1];
 				else $ref = null;
@@ -274,7 +274,7 @@ class Widget_CMS extends SiteEngine_Widget {
 		$mediaInfo = $mediaWidth = $mediaId = $mediaRef = array();
 
 		foreach($allMedia as $id => $media) {
-			$parts = split('/', $media->mime);
+			$parts = explode('/', $media->mime);
 			$isIm = $parts[0] == 'image';
 			$isImage[] = $isIm;
 			$isFlash[] = $media->mime == 'application/x-shockwave-flash';

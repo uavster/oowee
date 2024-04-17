@@ -7,10 +7,10 @@ class DB_MySQLConnection extends DB_Connection implements DB_IConnection {
 	private $link = FALSE;
 	
 	function connect($host, $userName, $password) {
-		$this->link = mysql_connect($host, $userName, $password);
-	}
+    $this->link = new mysqli($host, $userName, $password);	
+  }
 	
-	function __construct($connectionString) {
+  function __construct($connectionString) {
 		$connParams = $this->connStringToAssocArray($connectionString);
 		if ($connParams !== FALSE && 
 			array_key_exists('server', $connParams) && array_key_exists('user', $connParams) && array_key_exists('password', $connParams)) {
@@ -19,7 +19,9 @@ class DB_MySQLConnection extends DB_Connection implements DB_IConnection {
 	}
 	
 	function __destruct() {
-		if ($this->isConnected()) mysql_close($this->link);
+		if ($this->isConnected()) {
+      unset($this->link);
+    }
 	}
 
 	public function isConnected() {
@@ -27,27 +29,27 @@ class DB_MySQLConnection extends DB_Connection implements DB_IConnection {
 	}
 	
 	public function selectDatabase($database) {
-		return mysql_select_db($database, $this->link);
+		return $this->link->select_db($database);
 	}
 	
 	public function query($query) {
-		return mysql_query($query, $this->link);
+		return $this->link->query($query);
 	}
 
 	public function fetchArray($resource) {
-		return mysql_fetch_array($resource);
+		return $resource->fetch_array();
 	}
 	
 	public function getLastInsertedId() {
-		return mysql_insert_id($link);
+		return $this->link->insert_id();
 	}
 
 	public function escapeString($str) {
-		return mysql_real_escape_string($str, $this->link);
+		return $this->link->real_escape_string($str);
 	}
 
 	public function getLastError() {
-		return mysql_error();
+		return $this->link->error();
 	}
 }
 

@@ -204,19 +204,19 @@ class SiteEngine_Template {
 	protected function resolveLabel($label) {
 		$operands = array();
 		$operators = '=!<>&\|+\-\*\/\^~()';
-		if (preg_match_all("/[^$operators]+/", $label, &$operands, PREG_OFFSET_CAPTURE) === false) return false;
+		if (preg_match_all("/[^$operators]+/", $label, $operands, PREG_OFFSET_CAPTURE) === false) return false;
 		$haveOperators = preg_match("/[$operators]+/", $label) === 1;
 		$operands = $operands[0];
+		$last = 0;
+		$endLabel = '';
 		if ($haveOperators) {
-			$endLabel = '';
-			$last = 0;
 			for ($i = 0; $i < count($operands); $i++) {
 				$operand = $operands[$i];
 				$text = $operand[0];
 				$position = $operand[1];
 
 				$value = $this->resolveLabel($text);
-				if (is_string($value)) $value = "'$value'";
+				if (is_string($value)) $value = "'".addslashes($value)."'";
 				else if (is_bool($value)) $value = $value ? 'true' : 'false';
 
 				$endLabel .= substr($label, $last, $position - $last) . $value;
@@ -266,7 +266,7 @@ class SiteEngine_Template {
 	protected function renderRecursive($labelStart, $labelEnd, $output, $level, $instInfo) {
 		$labelStart0 = $labelStart;
 		$labelEnd0 = $labelEnd;
-		if ($instInfo['instruction'] == 'for') {
+		if (is_array($instInfo) && $instInfo['instruction'] == 'for') {
 			$this->autoVars[$instInfo['variable']] = $instInfo['start'];
 		}
 		while(($labelStart + $this->labelStartMarkLength) < $this->htmlLen && ($labelEnd + $this->labelEndMarkLength) < $this->htmlLen) {
@@ -374,7 +374,7 @@ class SiteEngine_Template {
 		return array('output' => $output, 'labelStart' => $labelStart, 'labelEnd' => $labelEnd);
 	}
 
-	protected function moveFragments($output) {
+	protected function moveFragments(&$output) {
 		// Group destinations
 		$groupedFragments = array();
 		$groupedModes = array();
@@ -504,7 +504,7 @@ class SiteEngine_Template {
 
 		// Insert move-pending fragments into destinations
 		if ($runMoves) {
-			$this->moveFragments(&$output);
+			$this->moveFragments($output);
 		}
 
 		return $output;

@@ -34,42 +34,13 @@ function getOoweeConfig($param = null) {
 }
 
 try {
-
-	// Disable magic quotes
-	if (get_magic_quotes_gpc()) {
-		if (function_exists('array_walk_recursive')) {
-			function stripslashes_gpc(&$value)
-			{
-				$value = stripslashes($value);
-			}
-			array_walk_recursive($_GET, 'stripslashes_gpc');
-			array_walk_recursive($_POST, 'stripslashes_gpc');
-			array_walk_recursive($_COOKIE, 'stripslashes_gpc');
-			array_walk_recursive($_REQUEST, 'stripslashes_gpc');		
-		} else {
-			$process = array(&$_GET, &$_POST, &$_COOKIE, &$_REQUEST);
-			while (list($key, $val) = each($process)) {
-				foreach ($val as $k => $v) {
-					unset($process[$key][$k]);
-					if (is_array($v)) {
-						$process[$key][stripslashes($k)] = $v;
-						$process[] = &$process[$key][stripslashes($k)];
-					} else {
-						$process[$key][stripslashes($k)] = stripslashes($v);
-					}
-				}
-			}
-			unset($process);
-		}
-	}
-
 	// The non existing URLs have been redirected 
 	$url = Helpers_Url::getQueryUrl($ooweeConfig['sitesConfigEncoding']);
 	$site = SiteEngine_SiteManager::getSiteFromUrl($url);
 	if ($site !== false) {
 		// Check if RedBean should be enabled
 		if ($site->getConfig('useRedBean')) {
-			require dirname(__FILE__).'/RedBean/rb.php';
+			require dirname(__FILE__).'/RedBean/rb-mysql.php';
 			$rbConnStr = $site->getConfig('redBeanConnString');
 			if ($rbConnStr !== false) $dbConnString = $rbConnStr;
 			else {

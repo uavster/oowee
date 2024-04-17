@@ -107,7 +107,8 @@ class SiteEngine_Site {
 	}
 
 	public function getEncoding() {
-		return array_key_exists('encoding', $this->map) ? $this->map['encoding'] : 'UTF-8';
+    global $ooweeConfig;
+		return array_key_exists('encoding', $this->map) ? $this->map['encoding'] : $ooweeConfig['sitesConfigEncoding'];
 	}
 
 	public function getPathToFile($fileName) {
@@ -131,7 +132,7 @@ class SiteEngine_Site {
 	}
 
 	public function getWidgetPathsInSiteMapByName($name, &$widgetParams = false) {
-		if ($widgetCallStrings !== false) $widgetCallStrings = array();
+		if ($widgetParams !== false) $widgetParams = array();
 		$widgetPaths = array();
 		foreach($this->map['pages'] as $page => $config) {
 			if ((!is_array($config)) || (!array_key_exists('labels', $config))) continue;
@@ -143,7 +144,7 @@ class SiteEngine_Site {
 					$widgetInfo = SiteEngine_Widget::deserializeCall($labelInfo['content']);
 					if ($widgetInfo['name'] == $name) {
 						$widgetPaths[] = $page . '/' . $label;
-						if (is_array($widgetCallStrings)) {
+						if (is_array($widgetParams)) {
 							$widgetParams[] = $widgetInfo['params'];
 						}
 					}
@@ -393,7 +394,7 @@ class SiteEngine_Site {
 				} else $output = $this->encodeOutput("Unable to locate template \"$labelContent\"");
 				break;
 			case 'widget':
-				$this->logContext = $callInfo['className'];
+				$this->logContext = isset($callInfo['className']) ? $callInfo['className'] : "";
 				try {
 					$callInfo = $this->decodeWidgetCall($labelContent, $this->query . '/' . $originalLabel);
 					if (is_array($callInfo)) {
@@ -451,9 +452,8 @@ class SiteEngine_Site {
 					$this->setLastError("Error in template '$templatePath': " . $template->getLastError());
 					return false;
 				}
-				else { 
-					echo $output;
-					return true; 
+				else {
+					return $output; 
 				}
 			} else {
 				$this->setLastError("Unable to load template file \"$templatePath\"");
@@ -540,9 +540,15 @@ class SiteEngine_Site {
 	protected function processUIQuery($query) {
 		// The query URL-decoded and utf8 encoded
 		if ($this->docExists($query)) {
-			if (!$this->render($query)) {
+			header('Content-Type: text/html; charset='.$this->getEncoding());
+      $output = $this->render($query);
+			if ($output !== false) {
+        header("Content-Length: ".strlen($output)); // strlen() returns the length of the string in bytes.
+        echo($output);
+      } else {
 				global $ooweeConfig, $ooweeError;
 				$ooweeError = $this->getLastError();
+        header("Content-Length: ".filesize($ooweeConfig['defaultSiteParams']['ooweeErrorPage']));
 				include $ooweeConfig['defaultSiteParams']['ooweeErrorPage'];
 			}
 		} else {
@@ -553,8 +559,8 @@ class SiteEngine_Site {
 				$ext = pathinfo($realPath, PATHINFO_EXTENSION);
 				if ($ext == 'php') include($realPath);
 				else {
-					//header('Content-length: ', filesize($realPath));
-					header('Content-type: ' . Helpers_Mime::fileExtensionToMimeType($ext));
+					header('Content-Type: ' . Helpers_Mime::fileExtensionToMimeType($ext, $this->getEncoding()));
+					header('Content-Length: '. filesize($realPath));
 					// Only send file if it's not in client's cache or it's not up to date there
 					if ($this->cacheControl(filemtime($realPath))) {
 						readfile($realPath);
@@ -614,7 +620,9 @@ class SiteEngine_Site {
 			// Transform output to XML
 			$output = SiteEngine_Widget::outputToXml($error, $output);
 			// Output headers
-			header('Content-Type: ' . Helpers_Mime::fileExtensionToMimeType('xml'));
+      // The XML template is at oowee, so the encoding is not that of the site.
+      global $ooweeConfig;
+			header('Content-Type: ' . Helpers_Mime::fileExtensionToMimeType('xml', $ooweeConfig['sitesConfigEncoding']));
 		} else {
 			header('Content-Type: ' . $widget->getProcessOutputContentType());
 		}
@@ -672,19 +680,21 @@ class SiteEngine_Site {
 		if (!isset($this->map['queryAliases'])) return false;
 		$queryAliases = $this->map['queryAliases'];
 		
+    // Firts, try resolving the query as is.
 		if (isset($queryAliases[$query])) {
-			$resolvedQuery = $queryAliases[$query];
-			return true;
-		} else {
-			$len = strlen($query);
-			if ($query[$len - 1] == '/') {
-				$query = substr($query, 0, $len - 1);
-				if (isset($queryAliases[$query])) {
-					$resolvedQuery = $queryAliases[$query];
-					return true;				
-				}
-			}
-		}
+      $resolvedQuery = $queryAliases[$query];
+      return true;
+    } else {
+      // If unsuccessful, try removing the last slash, if any.
+      $len = strlen($query);
+      if ($len > 0 && $query[$len - 1] == '/') {
+        $query = substr($query, 0, $len - 1);
+        if (isset($queryAliases[$query])) {
+          $resolvedQuery = $queryAliases[$query];
+          return true;				
+        }
+      }
+    }
 		return false;
 	}
 }
