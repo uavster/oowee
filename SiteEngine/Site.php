@@ -202,7 +202,7 @@ class SiteEngine_Site {
 				if ($filePath === false) return false;
 				$filePath = pathinfo($filePath, PATHINFO_DIRNAME); 
 				foreach($dirs as $dir) {
-					if ($filePath == realpath($basePath . $dir)) return false;
+					if (str_starts_with($filePath, realpath($basePath . $dir))) return false;
 				}
 			}
 		}
@@ -557,15 +557,13 @@ class SiteEngine_Site {
 			$realPath = $this->virtualPathToReal($query);
 			if ($realPath !== false) {
 				$ext = pathinfo($realPath, PATHINFO_EXTENSION);
-				if ($ext == 'php') include($realPath);
-				else {
-					header('Content-Type: ' . Helpers_Mime::fileExtensionToMimeType($ext, $this->getEncoding()));
-					header('Content-Length: '. filesize($realPath));
-					// Only send file if it's not in client's cache or it's not up to date there
-					if ($this->cacheControl(filemtime($realPath))) {
-						readfile($realPath);
-					}
-				}
+        header('Cache-Control: max-age=60, must-revalidate');
+        header('Content-Type: ' . Helpers_Mime::fileExtensionToMimeType($ext, $this->getEncoding()));
+        header('Content-Length: '. filesize($realPath));
+        // Only send file if it's not in client's cache or it's not up to date there
+        if ($this->cacheControl(filemtime($realPath))) {
+          readfile($realPath);
+        }
 			} else {
 				$this->outputDocNotFound();
 			}
@@ -633,7 +631,6 @@ class SiteEngine_Site {
 		}
 
 		if ($error || $widget->isProcessOutputClientCacheDisabled()) {
-			header("Expires: 0");
 			header("Pragma: no-cache");
 			header("Cache-Control: no-cache, must-revalidate, post-check=0, pre-check=0");
       header("Content-Type: ".$content_type);
