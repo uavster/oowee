@@ -15,7 +15,10 @@ $GLOBALS['ooweeConfig'] = array(
 		'siteWidgetDirectory' => 'widgets',			// Relative to the site's directory
 		'error404Page' => dirname(__FILE__).'/Docs/error404.html',	// Absolute path
 		'ooweeErrorPage' => dirname(__FILE__).'/Docs/ooweeError.php',	// Absolute path
-		// Files in these paths will not be accessible by the browser. Paths are relative to the site directory (current or default).
+    // The browser will check the validity of cached content with the server after this period of time.
+    // The server may respond with 304 (content did not change) or 200 and serve the new content.
+    'contentRevalidationPeriodSeconds' => 600,
+    // Files in these paths will not be accessible by the browser. Paths are relative to the site directory (current or default).
 		'privateDirectories' => array(),
 		// Files with these extensions will not be accessible by the browser. Files may be either in the current or default site.
 		'privateFileExtensions' => array('tpl', 'cfg'),

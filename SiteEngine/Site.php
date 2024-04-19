@@ -5,6 +5,7 @@ require_once $GLOBALS['ooweeConfig']['sitesPath'].'/SitesConfig.php';
 
 class SiteEngine_Site {
 	const SITE_MAP_REF_MARK = 'ref:';
+  const DEFAULT_CONTENT_REVALIDATION_SECONDS = 300;
 	
 	private $name;
 	private $baseUrl;
@@ -538,11 +539,15 @@ class SiteEngine_Site {
 	}
 
 	protected function processUIQuery($query) {
+    // Document and file freshness must be revalidated every $maxAge seconds.
+    $maxAge = $this->getConfig('contentRevalidationPeriodSeconds');
+    if ($maxAge === false) { $maxAge = self::DEFAULT_CONTENT_REVALIDATION_SECONDS; }
+    header("Cache-Control: max-age=$maxAge, must-revalidate");
 		// The query URL-decoded and utf8 encoded
 		if ($this->docExists($query)) {
 			header('Content-Type: text/html; charset='.$this->getEncoding());
       $output = $this->render($query);
-			if ($output !== false) {
+			if ($output !== false) {        
         header("Content-Length: ".strlen($output)); // strlen() returns the length of the string in bytes.
         echo($output);
       } else {
@@ -557,7 +562,6 @@ class SiteEngine_Site {
 			$realPath = $this->virtualPathToReal($query);
 			if ($realPath !== false) {
 				$ext = pathinfo($realPath, PATHINFO_EXTENSION);
-        header('Cache-Control: max-age=60, must-revalidate');
         header('Content-Type: ' . Helpers_Mime::fileExtensionToMimeType($ext, $this->getEncoding()));
         header('Content-Length: '. filesize($realPath));
         // Only send file if it's not in client's cache or it's not up to date there
@@ -637,6 +641,10 @@ class SiteEngine_Site {
       header("Content-Length: ".$content_length);
 			echo $output;
 		} else {
+      // Queries allowing caching must be revalidated after $maxAge seconds.
+      $maxAge = $this->getConfig('contentRevalidationPeriodSeconds');
+      if ($maxAge === false) { $maxAge = self::DEFAULT_CONTENT_REVALIDATION_SECONDS; }
+      header("Cache-Control: max-age=$maxAge, must-revalidate");
 			$modTime = $widget->getProcessOutputModificationTime();
 			if ($modTime === false || $this->cacheControl($modTime)) {
 				// Send the info, as no modification time was specified or the client cache is out of date
