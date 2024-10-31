@@ -1,8 +1,10 @@
 <?php
 class Widget_CMS extends SiteEngine_Widget {
 
+  private static $CMS_PREFIX = '!!cms/';
+
 	protected static function getBackCMSUrl() {
-		return getSite()->getBaseUrl() . '!!cms/';
+		return getSite()->getBaseUrl() . Widget_CMS::$CMS_PREFIX;
 	}
 
 	public static function getMediaUrl($ref, $action = '') {
@@ -10,11 +12,11 @@ class Widget_CMS extends SiteEngine_Widget {
 	}
 
 	public static function getMediaRefByUrl($url) {
-		$cmsPart = self::getBackCMSUrl();	// Only media of this site will be identified
-		if (strpos($url, $cmsPart) === 0)
-			return substr($url, strlen($cmsPart));
-		else 
-			return false;
+    $index = strpos($url, Widget_CMS::$CMS_PREFIX);
+    if ($index === false) {
+      return false;
+    }
+		return substr($url, $index + strlen(Widget_CMS::$CMS_PREFIX));
 	}
 
 	public static function getBrowserUrl($onSelectHandler = null, $handlerExtraParams = null) {
