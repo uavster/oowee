@@ -13,7 +13,7 @@ class SiteEngine_SiteManager {
 		$numUrlParts = count($urlParts);
 		if ($numUrlParts == 0) return $matchingSite;
 		$urlPartsFirstIndex = 0;
-		if (strcmp($urlParts[$urlPartsFirstIndex], 'http:') == 0) $urlPartsFirstIndex++;
+		if (strcmp($urlParts[$urlPartsFirstIndex], 'http:') == 0 || strcmp($urlParts[$urlPartsFirstIndex], 'https:') == 0) $urlPartsFirstIndex++;
 		if ($urlPartsFirstIndex >= $numUrlParts) return $matchingSite;
 		if (strcmp($urlParts[$urlPartsFirstIndex], '') == 0) $urlPartsFirstIndex++;
 		if ($urlPartsFirstIndex >= $numUrlParts) return $matchingSite;
@@ -24,7 +24,7 @@ class SiteEngine_SiteManager {
 			$aliasParts = explode('/', $siteAlias);
 			$numAliasParts = count($aliasParts);
 			$aliasPartsFirstIndex = 0;
-			if (strcmp($aliasParts[$aliasPartsFirstIndex], 'http:') == 0) $aliasPartsFirstIndex++;
+			if (strcmp($aliasParts[$aliasPartsFirstIndex], 'http:') == 0 || strcmp($aliasParts[$aliasPartsFirstIndex], 'https:') == 0) $aliasPartsFirstIndex++;
 			if ($aliasPartsFirstIndex >= $numAliasParts) continue;
 			if (strcmp($aliasParts[$aliasPartsFirstIndex], '') == 0) $aliasPartsFirstIndex++;
 			if ($aliasPartsFirstIndex >= $numAliasParts) continue;
