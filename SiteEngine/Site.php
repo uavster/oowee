@@ -673,6 +673,7 @@ class SiteEngine_Site {
 			$_GET = array_merge($_GET, $params);
 			// Remove parameters in resolved query and add them to $_REQUEST and $_GET
 			$query = str_replace('?'.parse_url($query, PHP_URL_QUERY), '', $query);
+      setQuery($query);
 		}
 
 		$this->requestType = $requestType;
