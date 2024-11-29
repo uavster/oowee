@@ -235,8 +235,11 @@ class SiteEngine_Site {
 		return substr($str, 0, strlen($start)) === $start;
 	}
 	
-	protected function findPageForQuery($query) {
-		foreach($this->map['pages'] as $key => $value) {
+	protected function findPageForQuery($query, $page_map = false) {
+    if ($page_map === false) {
+      $page_map = $this->map['pages'];
+    }
+		foreach($page_map as $key => $value) {
 			$reg = str_replace('/', '\/', "^$key\$");
 			$reg = str_replace('*', '.*', "/$reg/");
 			if (preg_match($reg, $query)) return $key;
@@ -254,7 +257,8 @@ class SiteEngine_Site {
 		// Solve chained references to other pages
 		while (is_string($pageInfo) && $this->startsWith($pageInfo, self::SITE_MAP_REF_MARK)) {
 			$refPage = substr($pageInfo, strlen(self::SITE_MAP_REF_MARK));
-			if (!array_key_exists($refPage, $mapPages)) {
+			$refPage = $this->findPageForQuery($refPage);
+			if ($refPage === false) {
 				$this->setLastError("Unable to reference page \"$refPage\" when loading \"$query\"");
 				return false;
 			}
@@ -273,10 +277,16 @@ class SiteEngine_Site {
 				$newValue = $value;
 				while (is_string($newValue) && $this->startsWith($newValue, self::SITE_MAP_REF_MARK)) {
 					$refPage = substr($newValue, strlen(self::SITE_MAP_REF_MARK));
-					if (!array_key_exists($refPage, $mapPages) || !array_key_exists($key, $mapPages[$refPage])) {
+          $refPage = $this->findPageForQuery($refPage);
+          if ($refPage === false) {
 						$this->setLastError("Unable to reference page \"$refPage\" when loading key \"$key\" for \"$query\"");
 						return false;
-					}
+          }
+          $key = $this->findPageForQuery($key, $mapPages[$refPage]);
+          if ($refPage === false) {
+						$this->setLastError("Unable to reference page \"$refPage\" when loading key \"$key\" for \"$query\"");
+						return false;
+          }
 					$newValue = $mapPages[$refPage][$key];
 				}
 				$pageInfo[$key] = $newValue;
@@ -284,10 +294,16 @@ class SiteEngine_Site {
 				$mergedProp = $pageInfo[$key];
 				while(array_key_exists(self::SITE_MAP_REF_MARK, $mergedProp)) {
 					$refPage = $mergedProp[self::SITE_MAP_REF_MARK];
-					if (!array_key_exists($refPage, $mapPages) || !array_key_exists($key, $mapPages[$refPage])) {
+          $refPage = $this->findPageForQuery($refPage);
+          if ($refPage === false) {
 						$this->setLastError("Unable to reference page \"$refPage\" when loading key \"$key\" for \"$query\"");
 						return false;
-					}
+          }
+          $key = $this->findPageForQuery($key, $mapPages[$refPage]);
+          if ($refPage === false) {
+						$this->setLastError("Unable to reference page \"$refPage\" when loading key \"$key\" for \"$query\"");
+						return false;
+          }
 					unset($mergedProp[self::SITE_MAP_REF_MARK]);
 					$mergedProp = array_merge($mapPages[$refPage][$key], $mergedProp);
 				}
