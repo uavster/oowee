@@ -24,8 +24,21 @@ function getSite() {
 	return $site;
 }
 
+$customQuery = false;
+
+// Returns the original query.
+function getOriginalQuery() {
+  return $_REQUEST['q'];
+}
+
 function getQuery() {
-	return $_REQUEST['q'];
+  global $customQuery;  
+	return $customQuery === false ? getOriginalQuery() : $customQuery;
+}
+
+function setQuery($query) {
+  global $customQuery;
+  $customQuery = $query;
 }
 
 function getOoweeConfig($param = null) {
