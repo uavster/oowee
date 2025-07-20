@@ -68,6 +68,7 @@ class Helpers_Mime {
 			case 'application/pdf': return 'pdf';
 			case 'application/x-shockwave-flash': return 'swf';
 			case 'application/x-compressed': return 'zip';
+      case 'application/x-gzip-compressed': return 'gz';
 			case 'application/excel': return 'xls';
 			case 'application/msword': return 'doc';
 			// Audio
