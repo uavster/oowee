@@ -21,6 +21,7 @@ class Helpers_Mime {
 			case 'pdf': return 'application/pdf';
 			case 'swf': return 'application/x-shockwave-flash';
 			case 'zip': return 'application/x-compressed';
+      case 'gz': return 'application/x-gzip-compressed';
 			case 'xls': return 'application/excel';
 			case 'xlsx': return 'application/excel';
 			case 'doc': return 'application/msword';
