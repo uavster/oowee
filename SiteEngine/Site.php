@@ -579,10 +579,6 @@ class SiteEngine_Site {
 			if ($realPath !== false) {
 				$ext = pathinfo($realPath, PATHINFO_EXTENSION);
         header('Content-Type: ' . Helpers_Mime::fileExtensionToMimeType($ext, $this->getEncoding()));
-        if ($ext == "gz") {
-          echo 'Content-Length: '. filesize($realPath);
-          exit(1);
-        }
         header('Content-Length: '. filesize($realPath));
         // Only send file if it's not in client's cache or it's not up to date there
         if ($this->cacheControl(filemtime($realPath))) {
