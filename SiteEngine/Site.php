@@ -579,7 +579,9 @@ class SiteEngine_Site {
 			if ($realPath !== false) {
 				$ext = pathinfo($realPath, PATHINFO_EXTENSION);
         header('Content-Type: ' . Helpers_Mime::fileExtensionToMimeType($ext, $this->getEncoding()));
-        header('Content-Length: '. filesize($realPath));
+        // Get the file size as a string (works for > 4GB).
+        $fileSize = trim(shell_exec('stat -c %s '.escapeshellarg($realPath)));
+        header('Content-Length: '. $fileSize);
         // Only send file if it's not in client's cache or it's not up to date there
         if ($this->cacheControl(filemtime($realPath))) {
           readfile($realPath);
