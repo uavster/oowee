@@ -582,7 +582,6 @@ class SiteEngine_Site {
         header('Content-Length: '. filesize($realPath));
         // Only send file if it's not in client's cache or it's not up to date there
         if ($this->cacheControl(filemtime($realPath))) {
-          echo "test";
           readfile($realPath);
         }
 			} else {
