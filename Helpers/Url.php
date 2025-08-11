@@ -34,7 +34,6 @@ class Helpers_Url {
 		$url_query = parse_url($url, PHP_URL_QUERY);
 		if ($url_query === NULL) return array();
 		$parameters = explode("&", urldecode($url_query));
-		$param_name = strtolower($param_name);
 		$out = array();
 		foreach($parameters as $parameter) {
 			$param_parts = explode("=", $parameter);
